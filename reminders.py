@@ -16,6 +16,7 @@ import time
 def main():
     run()
 
+
 # Check that number of days has been given
 # call method to post message to Slack
 def run():
@@ -28,10 +29,8 @@ def run():
         print('Success.')
 
 
-
-# Posting to a Slack channel
+# Posting to Slack channel
 def send_message_to_slack(days):
-
     # Get upcoming tasks from Aha!
     slack_message = getFeatures(days)
 
@@ -42,11 +41,11 @@ def send_message_to_slack(days):
     try:
         json_data = json.dumps(post)
 
-        req_sched = request.Request(get_url(apes_sched),
+        req_sched = request.Request(get_url('apes_sched'),
                               data=json_data.encode('ascii'),
                               headers={'Content-Type': 'application/json'})
 
-        req_gen = request.Request(get_url(apes_gen),
+        req_gen = request.Request(get_url('apes_gen'),
                               data=json_data.encode('ascii'),
                               headers={'Content-Type': 'application/json'})
 
@@ -56,52 +55,42 @@ def send_message_to_slack(days):
         print("EXCEPTION: " + str(em))
 
 
+# fetches features from Aha!
+# returns features that are due with in <days> days
 def getFeatures(days):
     # Get all features (doesn't have due dates, but we can pull IDs)
     response_features = requests.get('https://secure.aha.io/api/v1/features/?per_page=100', headers=getHeaders())
-
     data = response_features.json()
 
+    # get reference_nums of all features
     reference_nums = []
     names = []
-
     for i in range(len(data.get('features'))):
         reference_nums.append(data.get('features')[i].get('reference_num'))
         names.append(data.get('features')[i].get('name'))
 
-
-    #for i in range(len(names)):
-    #    print('{} ({})'.format(names[i], reference_nums[i]))
-
-    # Get feature with specified reference name
-    #response_indiv = requests.get('https://secure.aha.io/api/v1/features/PU-2', headers=headers)
-
+    # using the reference_nums, fetch features and extract the due date and release name
     due_dates = []
     release_names = []
-
     for i in range(len(names)):
         response_indiv = requests.get('https://secure.aha.io/api/v1/features/{}'.format(reference_nums[i]), headers=getHeaders())
         data = response_indiv.json()
         due_dates.append(data.get('feature').get('due_date'))
         release_names.append(data.get('feature').get('release').get('name'))
 
-    #for i in range(len(names)):
-    #    print('{}, {} ({})'.format(release_names[i], names[i], due_dates[i]))
-
+    # composes message to be returned
     slack_message = []
     for i in range(len(names)):
         if is_upcoming(due_dates[i], days):
             slack_message.append('\n{}, {} ({})'.format(release_names[i], names[i], due_dates[i]))
 
+    # api call return code
+    print(response)
 
     return slack_message
-    # return code
-    #print(response)
-
-    # print all JSON
-    #print(data)
 
 
+# returns true if <date> is within <days> days from now
 def is_upcoming(date, days):
     vals = date.split('-')
     today = time.localtime()
@@ -118,32 +107,33 @@ def is_upcoming(date, days):
     else:
         return False
 
+
+# fetches webhook url, api keys, etc.
 def get_url(index):
     with open('stuff.txt') as f:
         content = f.readlines()
 
-    if index == king_testing:
+    if index == 'king_testing':
         return content[7].rstrip('\n')
 
-    if index == apes_sched:
+    if index == 'apes_sched':
         return content[10].rstrip('\n')
 
-    if index == apes_gen:
+    if index == 'apes_gen':
         return content[13].rstrip('\n')
 
-    if index == aha_api_key:
+    if index == 'aha_api_key':
         return content[16].rstrip('\n')
 
+
+# headers for Aha! api call
 def getHeaders():
     return {
-        'Authorization': 'Bearer {}'.format(get_url(aha_api_key)',
+        'Authorization': 'Bearer {}'.format(get_url('aha_api_key')',
         'X-Aha-Account': 'apesofwrath668',
         'Content-Type': 'application/json',
         'Accept': 'application/json',
     }
-
-
-
 
 
 if __name__ == '__main__':
