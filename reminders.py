@@ -21,7 +21,7 @@ def main():
 # call method to post message to Slack
 def run():
     if len(sys.argv) != 2:
-        print('Usage: ./bot.py (time in days)')
+        print('Usage: ./reminders.py (time in days)')
         sys.exit(2)
 
     else:
