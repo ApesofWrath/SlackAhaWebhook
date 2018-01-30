@@ -1,14 +1,14 @@
 #! /usr/bin/env python3
 
 # Aha! webhook for Slack
-# Cody King
+# Cody King (Apes of Wrath 668)
 # 1/27/2018
 
 
 import sys
-from urllib import request, parse
+from urllib import request
 import requests, json
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 import time
 
 
@@ -37,6 +37,7 @@ def send_message_to_slack(days):
     # Combine the array of strings into single string
     text = ''.join(slack_message)
 
+    # JSON formatted attachment for Slack
     post = {
             	"fallback": 'Deadlines less than {} days away'.format(days),
             	#"text": "Daily reminder",
@@ -53,6 +54,7 @@ def send_message_to_slack(days):
             	]
             }
 
+    # send message to Slack
     try:
         json_data = json.dumps(post)
 
@@ -64,16 +66,17 @@ def send_message_to_slack(days):
                               data=json_data.encode('ascii'),
                               headers={'Content-Type': 'application/json'})
 
-        resp1 = request.urlopen(req_sched)
-        resp2 = request.urlopen(req_gen)
+        request.urlopen(req_sched)
+        request.urlopen(req_gen)
+
     except Exception as em:
         print("EXCEPTION: " + str(em))
 
 
 # fetches features from Aha!
-# returns features that are due with in <days> days
+# returns an array of features that are due within <days> days
 def getFeatures(days):
-    # Get all features (doesn't have due dates, but we can pull IDs)
+    # Get all features
     response_features = requests.get('https://secure.aha.io/api/v1/features/?per_page=100', headers=getHeaders())
     data = response_features.json()
 
@@ -99,7 +102,7 @@ def getFeatures(days):
         if is_upcoming(due_dates[i], days):
             slack_message.append('\n{}, {} ({})'.format(release_names[i], names[i], due_dates[i]))
 
-    # api call return code
+    # http status code returned by api call
     #print(response_indiv)
 
     return slack_message
