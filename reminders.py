@@ -34,9 +34,24 @@ def send_message_to_slack(days):
     # Get upcoming tasks from Aha!
     slack_message = getFeatures(days)
 
+    # Combine the array of strings into single string
+    text = ''.join(slack_message)
 
-    text = 'Here are the features with deadlines less than {} days away:{}'.format(days, ''.join(slack_message))
-    post = {"text": "{0}".format(text)}
+    post = {
+            	"fallback": 'Deadlines less than {} days away'.format(days),
+            	#"text": "Daily reminder",
+            	"pretext": "<https://apesofwrath668.aha.io/bookmarks/gantt_charts/6508438327823751704|Upcoming Deadlines>",
+            	"color": 'warning', # Can either be one of 'good', 'warning', 'danger', or any hex color code
+
+            	# Fields are displayed in a table on the message
+            	"fields": [
+            		{
+            			"title": 'Here are the features with deadlines less than {} days away'.format(days), # The title may not contain markup and will be escaped for you
+                        "value": '{}'.format(text),
+            			"short": False # Optional flag indicating whether the `value` is short enough to be displayed side-by-side with other values
+            		}
+            	]
+            }
 
     try:
         json_data = json.dumps(post)
