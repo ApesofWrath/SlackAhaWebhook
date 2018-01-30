@@ -85,7 +85,7 @@ def getFeatures(days):
             slack_message.append('\n{}, {} ({})'.format(release_names[i], names[i], due_dates[i]))
 
     # api call return code
-    print(response)
+    #print(response_indiv)
 
     return slack_message
 
@@ -129,7 +129,7 @@ def get_url(index):
 # headers for Aha! api call
 def getHeaders():
     return {
-        'Authorization': 'Bearer {}'.format(get_url('aha_api_key')',
+        'Authorization': 'Bearer {}'.format(get_url('aha_api_key')),
         'X-Aha-Account': 'apesofwrath668',
         'Content-Type': 'application/json',
         'Accept': 'application/json',
