@@ -8,5 +8,5 @@ Run the script with either zero or one additional argument(s). The argument shou
 
 Example: `./reminders 5`
 
-It should work with any Python 3 version. I can't guarantee compatability with Python 2.
+It should work with either Python 2 or 3 (but is aimed at Python 3).
 
