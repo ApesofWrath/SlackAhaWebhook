@@ -21,12 +21,16 @@ def main():
 # Check that number of days has been given
 # call method to post message to Slack
 def run():
-    if len(sys.argv) != 2:
-        print('Usage: ./reminders.py (time in days)')
+    if len(sys.argv) > 2:
+        print('Usage: ./reminders.py [days_until_deadline]')
         sys.exit(2)
 
-    else:
+    elif len(sys.argv) == 2:
         send_message_to_slack(sys.argv[1])
+        #print('Success.')
+
+    else:
+        send_message_to_slack(7)
         #print('Success.')
 
 
