@@ -2,9 +2,10 @@
 
 # Aha! webhook for Slack
 # Cody King (Apes of Wrath 668)
-# 1/27/2018
+# Jan 2018
 
 
+# imports
 import sys
 from urllib import request
 import requests, json
@@ -26,7 +27,7 @@ def run():
 
     else:
         send_message_to_slack(sys.argv[1])
-        print('Success.')
+        #print('Success.')
 
 
 # Posting to Slack channel
